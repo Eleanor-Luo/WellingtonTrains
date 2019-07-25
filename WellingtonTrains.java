@@ -170,11 +170,17 @@ public class WellingtonTrains{
      * */
     public void listAllStations(){
 
-        //looping over all the keys (station names) and printing them to the screan
-        for(String s : stationsMap.keySet()){
-            UI.println(s);
-        }
+        //cant loop on empty map
+        if(!stationsMap.isEmpty()) {
 
+            //looping over all the keys (station names) and printing them to the screan
+            for (String s : stationsMap.keySet()) {
+                UI.println(s);
+            }
+        }
+        else{
+            UI.println("no stations avalible (not loaded)");
+        }
     }
 
     /**
@@ -182,9 +188,16 @@ public class WellingtonTrains{
      * */
     public void listAllTrainLines(){
 
-        //looping over all the keys (line names) and printing them to screen
-        for(String l : linesMap.keySet()){
-            UI.println(l);
+        //cant loop on empty map
+        if(!linesMap.isEmpty()) {
+
+            //looping over all the keys (line names) and printing them to screen
+            for (String l : linesMap.keySet()) {
+                UI.println(l);
+            }
+        }
+        else{
+            UI.println("no Lines avalible (not loaded)");
         }
 
     }
@@ -199,16 +212,23 @@ public class WellingtonTrains{
      * */
     public void listLinesOfStation(String stationN){
 
-        //storing the selected station in a objecct
-        Station selectedStation = stationsMap.get(stationN);
+        //making sure the station to check exists
+        if(stationsMap.containsKey(stationN)) {
 
-        //getting all the lines that go through that station into a set
-        Set<TrainLine> linesThroughStation = selectedStation.getTrainLines();
+            //storing the selected station in a objecct
+            Station selectedStation = stationsMap.get(stationN);
 
-        //listing each lines name that is in that set of lines
-        for(TrainLine tL : linesThroughStation){
+            //getting all the lines that go through that station into a set
+            Set<TrainLine> linesThroughStation = selectedStation.getTrainLines();
 
-            UI.println(tL.getName());
+            //listing each lines name that is in that set of lines
+            for (TrainLine tL : linesThroughStation) {
+
+                UI.println(tL.getName());
+            }
+        }
+        else{
+            UI.println("Station doesnt exist make sure to use - for spaces");
         }
 
     }
@@ -222,44 +242,71 @@ public class WellingtonTrains{
      * */
     public void listStationsOnLine(String lineN){
 
-        //storing the selected trainline as an object
-        TrainLine selectedLine = linesMap.get(lineN);
+        //making sure the line to check for stations exists
+        if(linesMap.containsKey(lineN)) {
 
-        //getting all the stations that are on that line
-        List<Station> stationsOnline = selectedLine.getStations();
+            //storing the selected trainline as an object
+            TrainLine selectedLine = linesMap.get(lineN);
 
-        //printing each station name to the screen
-        for (Station s : stationsOnline){
+            //getting all the stations that are on that line
+            List<Station> stationsOnline = selectedLine.getStations();
 
-            UI.println(s.getName());
+            //printing each station name to the screen
+            for (Station s : stationsOnline) {
+
+                UI.println(s.getName());
+            }
+        }
+        else{
+            UI.println("line doesnt exist dont forget - for spaces and _ to seperate first and final station on line");
         }
 
     }
 
 
-
+    /**
+     * prints to screen the lines that has the selected station and the destination station
+     * heading in the correect direction
+     * searches each line to check if it has the stations in correct order
+     * @param stationN
+     * @param destN
+     * */
     public void checkConnected(String stationN ,String destN ){
 
-        boolean hasDepart;
+        //making sure both stations exist
+        if(stationsMap.containsKey(stationN) && stationsMap.containsKey(destN)) {
 
-        for(TrainLine tL : linesMap.values()){
+            boolean hasDepart;
 
-            hasDepart = false;
+            //looping over each line
+            for (TrainLine tL : linesMap.values()) {
 
-            List<Station> linesStations = tL.getStations();
+                //set to false to make sure not true from last line check
+                hasDepart = false;
 
-            for(Station s : linesStations){
+                //getting all stations on that line
+                List<Station> linesStations = tL.getStations();
 
-                if(s.getName().equals(stationN))
-                {
-                    hasDepart = true;
-                }
-                if (hasDepart && s.getName().equals(destN)){
 
-                    UI.println(tL.getName());
-                    return;
+                for (Station s : linesStations) {
+
+                    //making sure that the station name is before the destination in the list so the order isnt messed up
+                    if (s.getName().equals(stationN)) {
+
+                        //set to true so can now check for the destination station
+                        hasDepart = true;
+                    }
+                    else if (hasDepart && s.getName().equals(destN)) {
+
+                        UI.println(tL.getName());
+                        break;
+                    }
                 }
             }
+        }
+        else{
+
+            UI.println("Stations must exist dont forget - for spaces");
         }
 
     }
