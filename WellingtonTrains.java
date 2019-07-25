@@ -101,22 +101,32 @@ public class WellingtonTrains{
         int zone;
         float distFromHub;
 
-        //looping over each line
-        for(String station : stationInfo){
-            stationScan = new Scanner(station);
+        //try catch as scanner might cause error incase format changes
+        try {
+            //looping over each line
+            for (String station : stationInfo) {
+                stationScan = new Scanner(station);
 
-            //get all the tokens from the line
-            while (stationScan.hasNext()){
+                //get all the tokens from the line
+                while (stationScan.hasNext()) {
 
-                //getting the name then zone then distance
-                stationName = stationScan.next();
-                zone = stationScan.nextInt();
-                distFromHub = stationScan.nextFloat();
+                    //getting the name then zone then distance
+                    stationName = stationScan.next();
+                    zone = stationScan.nextInt();
+                    distFromHub = stationScan.nextFloat();
 
-                //adding each station to the map using the name as the key and the station object as value
-                stationsMap.put(stationName,new Station(stationName,zone,distFromHub));
+                    //adding each station to the map using the name as the key and the station object as value
+                    stationsMap.put(stationName, new Station(stationName, zone, distFromHub));
+                }
+
             }
+        }
+        catch(Exception e){
 
+            //as stations cant be loaded must close the program
+            UI.println("Error reading stations file (incorrect format)");
+            UI.sleep(2000);
+            UI.quit();
         }
 
         //if the scanner was used close it
