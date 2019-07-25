@@ -9,6 +9,8 @@
  */
 
 import ecs100.*;
+import javafx.beans.property.MapProperty;
+
 import java.awt.Color;
 import java.lang.reflect.Array;
 import java.util.*;
@@ -162,11 +164,74 @@ public class WellingtonTrains{
 
 
     /**
-     * querry 1 this will list to the user all of the stations from the stations map
+     * querry 1 this will list to the user all of the stations names from the stations map
+     * as the names are the keys it will print all the keys
      * */
     public void listAllStations(){
 
+        //looping over all the keys (station names) and printing them to the screan
+        for(String s : stationsMap.keySet()){
+            UI.println(s);
+        }
 
+    }
+
+    /**
+     * querry 2 this will list the names of the train lines by printing all the keys as they are the names
+     * */
+    public void listAllTrainLines(){
+
+        //looping over all the keys (line names) and printing them to screen
+        for(String l : linesMap.keySet()){
+            UI.println(l);
+        }
+
+    }
+
+
+
+    /**
+     * query 3
+     * takes a station name as parameter
+     * lists all the lines that go through the selected station
+     * @param stationN
+     * */
+    public void listLinesOfStation(String stationN){
+
+        //storing the selected station in a objecct
+        Station selectedStation = stationsMap.get(stationN);
+
+        //getting all the lines that go through that station into a set
+        Set<TrainLine> linesThroughStation = selectedStation.getTrainLines();
+
+        //listing each lines name that is in that set of lines
+        for(TrainLine tL: linesThroughStation){
+
+            UI.println(tL.getName());
+        }
+
+    }
+
+    /**
+     * 4th querry
+     * takes the line to get the stations on it as parameter
+     * then lists all the stations that are on this line
+     *
+     * @param lineName
+     * */
+    public void listStationsOnLine(String lineName){
+
+        //storing the selected trainline as an object
+        TrainLine selectedLine = linesMap.get(lineName);
+
+        //getting all the stations that are on that line
+        List<Station> stationsOnline = selectedLine.getStations();
+
+        //printing each station name to the screen
+        for (Station s: stationsOnline){
+
+            UI.println(s.getName());
+        }
 
     }
 
