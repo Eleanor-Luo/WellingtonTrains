@@ -10,6 +10,7 @@
 
 import ecs100.*;
 import java.awt.Color;
+import java.lang.reflect.Array;
 import java.util.*;
 import java.io.*;
 
@@ -28,6 +29,8 @@ public class WellingtonTrains{
     //hash map created to store all the stations info in it the key is the name as all stations have different names
     Map<String,Station> stationsMap = new HashMap<>();
 
+    //hash map for the train lines uses the key of its name and stores the object as value
+    Map<String, TrainLine> linesMap = new HashMap<>();
     // Fields for the suggested GUI.
     private String stationName;            // station to get info about, or to start journey from
     private String lineName;               // train line to get info about.
@@ -117,6 +120,53 @@ public class WellingtonTrains{
         if(stationScan != null) {
             stationScan.close();
         }
+
+    }
+
+    /**
+     * loads all the train lines into the train line map
+     * also reads each related stations data file for each
+     * line this allows the stations list in the line object to be
+     * filled and the lines list on the stations object to be filled
+     * */
+    public void loadTrainLineData(){
+
+        //getting all the lines from the train lines data file
+        ArrayList<String> trainLinesInfo = readAllLines("train-lines.data");
+        ArrayList<String> linesStations;
+
+        //for each line create a new trainline object and add it to the map each line only has the name so no scanner needed
+        for(String trainLine : trainLinesInfo){
+
+            //adding the line to the lines map and creating object
+            linesMap.put(trainLine, new TrainLine(trainLine));
+
+            //reading all the stations that this train passes through
+            linesStations = readAllLines(trainLine + "-stations.data");
+
+            for(String station : linesStations){
+
+                //if the station is real
+                if(stationsMap.containsKey(station)){
+
+                    //add the station object to the lines station list and the line to the stations line list
+                    linesMap.get(trainLine).addStation(stationsMap.get(station));
+                    stationsMap.get(station).addTrainLine(linesMap.get(trainLine));
+
+                }
+            }
+
+        }
+
+    }
+
+
+    /**
+     * querry 1 this will list to the user all of the stations from the stations map
+     * */
+    public void listAllStations(){
+
+
 
     }
 
