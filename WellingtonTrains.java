@@ -57,7 +57,7 @@ public class WellingtonTrains{
         loadTrainLineData();
         UI.println("Loaded Train Lines");
         // The following is only needed for the Completion and Challenge
-        loadTrainServicesData();
+       // loadTrainServicesData();
         UI.println("Loaded Train Services");
     }
 
@@ -76,8 +76,9 @@ public class WellingtonTrains{
         UI.addButton("Lines of Station",    () -> {listLinesOfStation(this.stationName);});
         UI.addButton("Stations on Line",    () -> {listStationsOnLine(this.lineName);});
         UI.addButton("Stations connected?", () -> {checkConnected(this.stationName, this.destinationName);});
-        UI.addButton("Next Services",       () -> {findNextServices(this.stationName, this.startTime);});
-        UI.addButton("Find Trip",           () -> {findTrip(this.stationName, this.destinationName, this.startTime);});
+       // UI.addButton("Next Services",       () -> {findNextServices(this.stationName, this.startTime);});
+        //UI.addButton("Find Trip",           () -> {findTrip(this.stationName, this.destinationName, this.startTime);});
+        UI.addButton("Clear", UI::clearText);
         UI.addButton("Quit", UI::quit);
         UI.setDivider(1.0);
     }
@@ -93,7 +94,7 @@ public class WellingtonTrains{
     public void loadStationData(){
 
         //getting each line of the stations data file each line is related to a station
-        ArrayList<String> stationInfo = readAllLines("stations.data");
+        ArrayList<String> stationInfo = readAllLines(".\\data\\stations.data");
 
         Scanner stationScan = null;
         String stationName;
@@ -105,7 +106,7 @@ public class WellingtonTrains{
             stationScan = new Scanner(station);
 
             //get all the tokens from the line
-            while (stationScan.hasNextLine()){
+            while (stationScan.hasNext()){
 
                 //getting the name then zone then distance
                 stationName = stationScan.next();
@@ -134,7 +135,7 @@ public class WellingtonTrains{
     public void loadTrainLineData(){
 
         //getting all the lines from the train lines data file
-        ArrayList<String> trainLinesInfo = readAllLines("train-lines.data");
+        ArrayList<String> trainLinesInfo = readAllLines(".\\data\\train-lines.data");
         ArrayList<String> linesStations;
 
         //for each line create a new trainline object and add it to the map each line only has the name so no scanner needed
@@ -144,7 +145,7 @@ public class WellingtonTrains{
             linesMap.put(trainLine, new TrainLine(trainLine));
 
             //reading all the stations that this train passes through
-            linesStations = readAllLines(trainLine + "-stations.data");
+            linesStations = readAllLines(".//data//" + trainLine + "-stations.data");
 
             for(String station : linesStations){
 
@@ -205,7 +206,7 @@ public class WellingtonTrains{
         Set<TrainLine> linesThroughStation = selectedStation.getTrainLines();
 
         //listing each lines name that is in that set of lines
-        for(TrainLine tL: linesThroughStation){
+        for(TrainLine tL : linesThroughStation){
 
             UI.println(tL.getName());
         }
@@ -217,20 +218,48 @@ public class WellingtonTrains{
      * takes the line to get the stations on it as parameter
      * then lists all the stations that are on this line
      *
-     * @param lineName
+     * @param lineN
      * */
-    public void listStationsOnLine(String lineName){
+    public void listStationsOnLine(String lineN){
 
         //storing the selected trainline as an object
-        TrainLine selectedLine = linesMap.get(lineName);
+        TrainLine selectedLine = linesMap.get(lineN);
 
         //getting all the stations that are on that line
         List<Station> stationsOnline = selectedLine.getStations();
 
         //printing each station name to the screen
-        for (Station s: stationsOnline){
+        for (Station s : stationsOnline){
 
             UI.println(s.getName());
+        }
+
+    }
+
+
+
+    public void checkConnected(String stationN ,String destN ){
+
+        boolean hasDepart;
+
+        for(TrainLine tL : linesMap.values()){
+
+            hasDepart = false;
+
+            List<Station> linesStations = tL.getStations();
+
+            for(Station s : linesStations){
+
+                if(s.getName().equals(stationN))
+                {
+                    hasDepart = true;
+                }
+                if (hasDepart && s.getName().equals(destN)){
+
+                    UI.println(tL.getName());
+                    return;
+                }
+            }
         }
 
     }
