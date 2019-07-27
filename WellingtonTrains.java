@@ -57,7 +57,7 @@ public class WellingtonTrains{
         loadTrainLineData();
         UI.println("Loaded Train Lines");
         // The following is only needed for the Completion and Challenge
-       // loadTrainServicesData();
+        loadTrainServicesData();
         UI.println("Loaded Train Services");
     }
 
@@ -76,7 +76,7 @@ public class WellingtonTrains{
         UI.addButton("Lines of Station",    () -> {listLinesOfStation(this.stationName);});
         UI.addButton("Stations on Line",    () -> {listStationsOnLine(this.lineName);});
         UI.addButton("Stations connected?", () -> {checkConnected(this.stationName, this.destinationName);});
-       // UI.addButton("Next Services",       () -> {findNextServices(this.stationName, this.startTime);});
+        UI.addButton("Next Services",       () -> {findNextServices(this.stationName, this.startTime);});
         //UI.addButton("Find Trip",           () -> {findTrip(this.stationName, this.destinationName, this.startTime);});
         UI.addButton("Clear", UI::clearText);
         UI.addButton("Quit", UI::quit);
@@ -249,6 +249,8 @@ public class WellingtonTrains{
             for (String s : stationsMap.keySet()) {
                 UI.println(s);
             }
+
+            UI.println(".....................");
         }
         else{
             UI.println("no stations avalible (not loaded)");
@@ -267,6 +269,8 @@ public class WellingtonTrains{
             for (String l : linesMap.keySet()) {
                 UI.println(l);
             }
+
+            UI.println(".....................");
         }
         else{
             UI.println("no Lines avalible (not loaded)");
@@ -298,6 +302,8 @@ public class WellingtonTrains{
 
                 UI.println(tL.getName());
             }
+
+            UI.println(".....................");
         }
         else{
             UI.println("Station doesnt exist make sure to use - for spaces");
@@ -328,6 +334,8 @@ public class WellingtonTrains{
 
                 UI.println(s.getName());
             }
+
+            UI.println(".....................");
         }
         else{
             UI.println("line doesnt exist dont forget - for spaces and _ to seperate first and final station on line");
@@ -344,6 +352,8 @@ public class WellingtonTrains{
      * @param destN
      * */
     public void checkConnected(String stationN ,String destN ){
+
+        boolean isConnected = false;
 
         //making sure both stations exist
         if(stationsMap.containsKey(stationN) && stationsMap.containsKey(destN)) {
@@ -370,16 +380,119 @@ public class WellingtonTrains{
                         } else if (hasDepart && s.getName().equals(destN)) {
 
                             UI.println(tL.getName());
+                            isConnected = true;
                             break;
                         }
-
                     }
                 }
+            }
+
+            //checking if its connected or not
+            if(isConnected){
+
+                UI.println(".......................");
+            }
+            else{
+
+                UI.println("No Connection");
             }
         }
         else{
 
             UI.println("Stations must exist dont forget - for spaces");
+        }
+
+    }
+
+
+
+    /**
+     * will find the next departing service time for all the lines on the service
+     *the station and start time are parameters will find the next time either equall to or greater than the time given in 24hr
+     * @param stationN
+     * @param startT
+     * */
+    public void findNextServices(String stationN, int startT){
+
+
+        Set<TrainLine> linesOnStation;      //set of all lines on the station
+        List<Station> stationsOnLine;       //set for all stations on the line
+        List<TrainService> servicesOnLine;  //set for all services on the line
+        int stationPosition = -1;           //start position to find where the station is on service times
+
+
+        boolean serviceFound = false;
+
+        //station must exist and time not be negative
+        if(stationsMap.containsKey(stationN) && startT >= 0){
+
+            Station chosenStation = stationsMap.get(stationN);
+
+            //getting the lines on station
+            linesOnStation =  chosenStation.getTrainLines();
+
+            if(!linesOnStation.isEmpty()){
+
+                for(TrainLine tL : linesOnStation){
+
+                    //getting the stations on the current line being looped over
+                    stationsOnLine = tL.getStations();
+
+                    if(!stationsOnLine.isEmpty()){
+
+                        //start position -1 as starting new check
+                        stationPosition = -1;
+
+                        //loop over all stations on the line
+                        for(int i = 0; i < stationsOnLine.size(); i++){
+
+                            //if the name of the station is the same as selected then store the index as that is the index for time  to search for
+                            if(stationsOnLine.get(i).getName().equals(stationN)){
+                                stationPosition = i;
+                            }
+                        }
+                    }
+
+
+                    //getting the services on the line
+                    servicesOnLine = tL.getTrainServices();
+
+                    if(stationPosition != -1) {
+                        //looping over each service
+                        for (TrainService tS : servicesOnLine) {
+
+                            //getting the time in the station position the selected stations time the train is there
+                            int timeCheck = tS.getTimes().get(stationPosition);
+
+                            //checking if it is valid to be next service
+                            if (timeCheck >= startT) {
+
+                                //print the line name and time then return as dont want all times
+                                UI.println(tL.getName() + ": " + timeCheck);
+                                serviceFound = true;
+                                break;
+
+                            }
+                        }
+                    }
+
+                }
+
+            }
+
+            //printing end seperator or if it wasnt found
+            if(!serviceFound){
+
+                UI.println("no services found");
+            }
+            else{
+
+                UI.println("......................");
+            }
+        }
+        else{
+
+            UI.println("station must exist and time be greater atleast 0");
         }
 
     }
