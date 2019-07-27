@@ -57,7 +57,7 @@ public class WellingtonTrains{
         loadTrainLineData();
         UI.println("Loaded Train Lines");
         // The following is only needed for the Completion and Challenge
-        loadTrainServicesData();
+       // loadTrainServicesData();
         UI.println("Loaded Train Services");
     }
 
@@ -372,6 +372,7 @@ public class WellingtonTrains{
                             UI.println(tL.getName());
                             break;
                         }
+
                     }
                 }
             }
