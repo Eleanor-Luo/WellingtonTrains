@@ -77,7 +77,7 @@ public class WellingtonTrains{
         UI.addButton("Stations on Line",    () -> {listStationsOnLine(this.lineName);});
         UI.addButton("Stations connected?", () -> {checkConnected(this.stationName, this.destinationName);});
         UI.addButton("Next Services",       () -> {findNextServices(this.stationName, this.startTime);});
-        //UI.addButton("Find Trip",           () -> {findTrip(this.stationName, this.destinationName, this.startTime);});
+        UI.addButton("Find Trip",           () -> {findTrip(this.stationName, this.destinationName, this.startTime);});
         UI.addButton("Clear", UI::clearText);
         UI.addButton("Quit", UI::quit);
         UI.setDivider(1.0);
@@ -405,6 +405,64 @@ public class WellingtonTrains{
     }
 
 
+    /**
+     * overloaded method
+     * returns the lines that has the selected station and the destination station in a set
+     * heading in the correect direction
+     * searches each line to check if it has the stations in correct order
+     * has boolean to tell if want all or just first returned
+     *
+     * @param stationN
+     * @param destN
+     * @param getAll
+     * */
+    public Set<TrainLine> checkConnected(String stationN ,String destN, boolean getAll){
+
+        Set<TrainLine> connectedLines = new HashSet<>();
+
+        //making sure both stations exist
+        if(stationsMap.containsKey(stationN) && stationsMap.containsKey(destN)) {
+
+            boolean hasDepart;
+
+            //looping over each line
+            for (TrainLine tL : linesMap.values()) {
+
+                //set to false to make sure not true from last line check
+                hasDepart = false;
+
+                //getting all stations on that line
+                List<Station> linesStations = tL.getStations();
+
+                if(!linesStations.isEmpty()) {
+                    for (Station s : linesStations) {
+
+                        //making sure that the station name is before the destination in the list so the order isnt messed up
+                        if (s.getName().equals(stationN)) {
+
+                            //set to true so can now check for the destination station
+                            hasDepart = true;
+                        } else if (hasDepart && s.getName().equals(destN)) {
+
+                            //adding the found line to the set
+                            connectedLines.add(tL);
+
+                            //if it isnt get all just return the one
+                            if(!getAll){
+                                return connectedLines;
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
+
+        }
+        //return the set of connected train lines could be empty
+        return connectedLines;
+    }
+
+
 
     /**
      * will find the next departing service time for all the lines on the service
@@ -494,6 +552,125 @@ public class WellingtonTrains{
 
             UI.println("station must exist and time be greater atleast 0");
         }
+
+    }
+
+
+
+    /**
+     * method will find the train line and time the train leaves chosen departure station
+     * it will also return the arival time at destination and the number of zones traveled through
+     * takes parameters of station name destination name and start time
+     * @param stationN
+     * @param destN
+     * @param startT
+     * */
+    public void findTrip(String stationN, String destN, int startT){
+
+        //making sure the stations exist and the time is a valid one
+        if(stationsMap.containsKey(stationN) && stationsMap.containsKey(destN) && startT >= 0) {
+
+            //getting the zones get the max number as start and min as end
+            int startZone = Math.max(stationsMap.get(stationN).getZone(), stationsMap.get(destN).getZone());
+            int endZone =  Math.min(stationsMap.get(stationN).getZone(), stationsMap.get(destN).getZone());
+
+            int departTime = -1;
+            int arivalTime = -1;
+
+            //Map that holds the train line as key and list as value that will have the depart time in position 0 and arival in 1
+            Map<TrainLine, List<Integer>> tripInfo = new HashMap<>();
+
+
+           //finding number of zones traveled through add one as final zone is counted
+            int totalZones = startZone - endZone + 1;
+
+            //getting all the lines with these stations connected
+            Set<TrainLine> connectedLines = checkConnected(stationN, destN, true);
+
+            //return as no connection
+            if(connectedLines.isEmpty()){
+
+                UI.println("no direct line connection between stations");
+                return;
+            }
+
+            //looping over all connected lines for the stations
+            for(TrainLine tL : connectedLines){
+
+               //getting the stations on the current loop line
+                List<Station> stationsOnLine = tL.getStations();
+                int startPos = -1;
+                int endPos = -1;
+
+                //looping over to find the index of the departure and arival station
+                for(int i = 0; i < stationsOnLine.size(); i++){
+
+                    if(stationsOnLine.get(i).getName().equals(stationN)){
+                        startPos = i;
+                    }
+                    else if(stationsOnLine.get(i).getName().equals(destN)){
+                        endPos = i;
+                    }
+
+                }
+
+                //getting the services on the current line and looping over them
+                List<TrainService> linesServices =  tL.getTrainServices();
+
+                for(TrainService tS : linesServices){
+
+                    //seeing if the time in the start position station is greater than or is the selected start time and the end ends there doest skip it
+                    if(tS.getTimes().get(startPos) >= startT && tS.getTimes().get(endPos) != -1){
+
+                        departTime = tS.getTimes().get(startPos);
+                        arivalTime = tS.getTimes().get(endPos);
+
+                        //creating temperary list to pass the values into the tripInfo map as a list
+                        List<Integer> tripsTimes = new ArrayList<>();
+                        tripsTimes.add(departTime);
+                        tripsTimes.add(arivalTime);
+
+                        //adding the train line and the list with the times to the map
+                        tripInfo.put(tL,tripsTimes);
+
+                        //breaking from loop as only need soonest time for each line
+                        break;
+                    }
+
+                }
+
+            }
+
+            TrainLine nextDepartLine = null;
+            int lowestDepartTime = -1;
+
+            //looping over all keys in the tripInfo map
+            for(TrainLine tL : tripInfo.keySet()){
+
+                //getting the departure time for check
+                int tempDepart = tripInfo.get(tL).get(0);
+
+                //checking if the time to check is less than the previous one or none are set yet
+                if(tempDepart < lowestDepartTime || lowestDepartTime == -1){
+
+                    //setting the new lowest and the related key (train line)
+                    lowestDepartTime = tempDepart;
+                    nextDepartLine = tL;
+                }
+
+            }
+
+            //printing the line departure time and arival also how many zones the trip goes through
+            UI.println("Train Line: " + nextDepartLine.getName());
+            UI.println("Departure Time: " + tripInfo.get(nextDepartLine).get(0));
+            UI.println("Arrival Time: " + tripInfo.get(nextDepartLine).get(1));
+            UI.println("Number of zones for trip: " + totalZones);
+            UI.println("......................");
+        }
+        else{
+            UI.println("stations must exist and time be greater than or 0");
+        }
+
 
     }
 
