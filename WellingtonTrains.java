@@ -99,7 +99,7 @@ public class WellingtonTrains{
         Scanner stationScan = null;
         String stationName;
         int zone;
-        float distFromHub;
+        double distFromHub;
 
         //try catch as scanner might cause error incase format changes
         try {
@@ -116,7 +116,7 @@ public class WellingtonTrains{
                         //getting the name then zone then distance
                         stationName = stationScan.next();
                         zone = stationScan.nextInt();
-                        distFromHub = stationScan.nextFloat();
+                        distFromHub = stationScan.nextDouble();
 
                         //adding each station to the map using the name as the key and the station object as value
                         stationsMap.put(stationName, new Station(stationName, zone, distFromHub));
@@ -481,8 +481,8 @@ public class WellingtonTrains{
 
         boolean serviceFound = false;
 
-        //station must exist and time not be negative
-        if(stationsMap.containsKey(stationN) && startT >= 0){
+        //station must exist and time not be negative or 0
+        if(stationsMap.containsKey(stationN) && startT > 0){
 
             Station chosenStation = stationsMap.get(stationN);
 
@@ -550,7 +550,7 @@ public class WellingtonTrains{
         }
         else{
 
-            UI.println("station must exist and time be greater atleast 0");
+            UI.println("station must exist and time be greater at least 1");
         }
 
     }
@@ -568,7 +568,7 @@ public class WellingtonTrains{
     public void findTrip(String stationN, String destN, int startT){
 
         //making sure the stations exist and the time is a valid one
-        if(stationsMap.containsKey(stationN) && stationsMap.containsKey(destN) && startT >= 0) {
+        if(stationsMap.containsKey(stationN) && stationsMap.containsKey(destN) && startT > 0) {
 
             //getting the zones get the max number as start and min as end
             int startZone = Math.max(stationsMap.get(stationN).getZone(), stationsMap.get(destN).getZone());
@@ -644,6 +644,13 @@ public class WellingtonTrains{
             TrainLine nextDepartLine = null;
             int lowestDepartTime = -1;
 
+            //making sure there is a trip possible
+            if(tripInfo.isEmpty()){
+
+                UI.println("no trips exist sorry try setting earilier time");
+                return;
+            }
+
             //looping over all keys in the tripInfo map
             for(TrainLine tL : tripInfo.keySet()){
 
@@ -668,7 +675,7 @@ public class WellingtonTrains{
             UI.println("......................");
         }
         else{
-            UI.println("stations must exist and time be greater than or 0");
+            UI.println("stations must exist and time be greater than 0");
         }
 
 
