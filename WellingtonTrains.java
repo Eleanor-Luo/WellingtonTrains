@@ -66,19 +66,23 @@ public class WellingtonTrains{
      * You will need to implement the methods here.
      */
     public void setupGUI(){
-        UI.addButton("All Stations",   this::listAllStations);
-        UI.addButton("All Lines",      this::listAllTrainLines);
+
+        //if the called action displays text then also set the divider to be fully right
+        UI.addButton("All Stations",   () ->{listAllStations(); UI.setDivider(1);});
+        UI.addButton("All Lines",      () ->{listAllTrainLines(); UI.setDivider(1);});
         UI.addTextField("Station",     (String name) -> {this.stationName=name;});
         UI.addTextField("Train Line",  (String name) -> {this.lineName=name;});
         UI.addTextField("Destination", (String name) -> {this.destinationName=name;});
         UI.addTextField("Time (24hr)", (String time) ->
             {try{this.startTime=Integer.parseInt(time);}catch(Exception e){UI.println("Enter four digits");}});
-        UI.addButton("Lines of Station",    () -> {listLinesOfStation(this.stationName);});
-        UI.addButton("Stations on Line",    () -> {listStationsOnLine(this.lineName);});
-        UI.addButton("Stations connected?", () -> {checkConnected(this.stationName, this.destinationName);});
-        UI.addButton("Next Services",       () -> {findNextServices(this.stationName, this.startTime);});
-        UI.addButton("Find Trip",           () -> {findTrip(this.stationName, this.destinationName, this.startTime);});
-        UI.addButton("Clear", UI::clearText);
+        UI.addButton("Lines of Station",    () -> {listLinesOfStation(this.stationName); UI.setDivider(1);});
+        UI.addButton("Stations on Line",    () -> {listStationsOnLine(this.lineName); UI.setDivider(1);});
+        UI.addButton("Stations connected?", () -> {checkConnected(this.stationName, this.destinationName); UI.setDivider(1);});
+        UI.addButton("Next Services",       () -> {findNextServices(this.stationName, this.startTime); UI.setDivider(1);});
+        UI.addButton("Find Trip",           () -> {findTrip(this.stationName, this.destinationName, this.startTime); UI.setDivider(1);});
+        UI.addButton("Show Geographical map", () -> {showMap(".\\data\\geographic-map.png");});
+        UI.addButton("Show Lines map", () -> {showMap(".\\data\\system-map.png");});
+        UI.addButton("Clear",UI::clearPanes);
         UI.addButton("Quit", UI::quit);
         UI.setDivider(1.0);
     }
@@ -590,7 +594,9 @@ public class WellingtonTrains{
             //return as no connection
             if(connectedLines.isEmpty()){
 
-                UI.println("no direct line connection between stations");
+                UI.println("no direct connection");
+                //calling multi line trip to find across multiple lines
+                //findMultiLineTrip(stationN, destN, startT);
                 return;
             }
 
@@ -680,6 +686,99 @@ public class WellingtonTrains{
 
 
     }
+
+
+    /////////////////////////////////////////////////////////////////////////////WORKING ON THIS METHOD AT MOMENT CURRENTLY NOT WORKING
+   /* public void findMultiLineTrip(String departN, String ariveN, int leaveT){
+
+        //making sure all input is valid for search
+        if(stationsMap.containsKey(departN) && stationsMap.containsKey(ariveN) && leaveT > 0){
+
+            Set<TrainLine> connectLines = new HashSet<>();
+            Map<Station, Set<TrainLine>> connectionPoint = new HashMap<>();
+
+            //getting the train lines on the departing station
+            Set<TrainLine> linesOnDepart = stationsMap.get(departN).getTrainLines();
+
+            for(TrainLine tL : linesOnDepart){
+
+                //getting all stations on each line
+                List<Station> stationsOnLine  = tL.getStations();
+
+                for(Station linesStations : stationsOnLine){
+
+                    //clearing old lines as new station
+                    connectLines.clear();
+
+                    //getting all the lines on each looped station
+                    Set<TrainLine> linesOnStationsOnLine  = linesStations.getTrainLines();
+
+                    for(TrainLine lineOnStation : linesOnStationsOnLine){
+
+                        //checking if that line also connects to the destination and filling the line and station to the connectionPoint map
+                        if(lineOnStation.getStations().contains(stationsMap.get(ariveN))){
+
+                           //adding the line to the connectLines set storiing the lines on that station that connect
+                           connectLines.add(lineOnStation);
+
+                        }
+                    }
+
+                    if(!connectLines.isEmpty()) {
+
+                        //adding the connect station and all the lines that connect
+                        connectionPoint.put(linesStations, connectLines);
+                    }
+                }
+
+            }
+
+
+
+            for(Station connectionStation : connectionPoint.keySet()){
+
+
+                //findTrip(connectionStation.getName(), ariveN, );
+
+
+
+            }
+
+
+
+
+
+
+
+        }
+
+
+
+
+
+    }
+
+*/
+
+
+    /**
+     * is callled when button pressed to show map will take the file name as parameter
+     * then clears the old map or any graphics from screen and draws the full sized image just off the top corner
+     * the divider is moved in to show the image no matter the window size and the user can pull it futher if required
+     * @param fileName
+     * */
+    public void showMap(String fileName){
+
+        UI.clearGraphics();
+
+        //moving the text divider to the far left
+        UI.setDivider(0);
+
+        UI.drawImage(fileName, 10, 10);
+    }
+
+
+
 
     // Utility method to help with reading data files
     /** Read all lines in a file into a list of Strings */
