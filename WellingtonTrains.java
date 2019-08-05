@@ -158,6 +158,7 @@ public class WellingtonTrains{
 
         if(!trainLinesInfo.isEmpty()) {
 
+
             //for each line create a new trainline object and add it to the map each line only has the name so no scanner needed
             for (String trainLine : trainLinesInfo) {
 
@@ -358,7 +359,6 @@ public class WellingtonTrains{
 
         boolean isConnected = false;
 
-
         //making sure both stations exist
         if(stationsMap.containsKey(stationN) && stationsMap.containsKey(destN)) {
 
@@ -408,6 +408,7 @@ public class WellingtonTrains{
 
     }
 
+
     /**
      * overloaded method
      * returns the lines that has the selected station and the destination station in a set
@@ -456,38 +457,10 @@ public class WellingtonTrains{
                             }
                             break;
                         }
-
                     }
-
                 }
-
             }
 
-            TrainLine nextDepartLine = null;
-            int lowestDepartTime = -1;
-
-            //making sure there is a trip possible
-            if(tripInfo.isEmpty()){
-
-                UI.println("no trips exist sorry try setting earilier time");
-                return;
-            }
-
-            //looping over all keys in the tripInfo map
-            for(TrainLine tL : tripInfo.keySet()){
-
-                //getting the departure time for check
-                int tempDepart = tripInfo.get(tL).get(0);
-
-                //checking if the time to check is less than the previous one or none are set yet
-                if(tempDepart < lowestDepartTime || lowestDepartTime == -1){
-
-                    //setting the new lowest and the related key (train line)
-                    lowestDepartTime = tempDepart;
-                    nextDepartLine = tL;
-                }
-
-            }
         }
         //return the set of connected train lines could be empty
         return connectedLines;
@@ -578,99 +551,14 @@ public class WellingtonTrains{
 
                 UI.println("......................");
             }
-
         }
         else{
-            UI.println("stations must exist and time be greater than 0");
-        }
 
-
-    }
-
-
-    /////////////////////////////////////////////////////////////////////////////WORKING ON THIS METHOD AT MOMENT CURRENTLY NOT WORKING
-   /* public void findMultiLineTrip(String departN, String ariveN, int leaveT){
-
-        //making sure all input is valid for search
-        if(stationsMap.containsKey(departN) && stationsMap.containsKey(ariveN) && leaveT > 0){
-
-            Set<TrainLine> connectLines = new HashSet<>();
-            Map<Station, Set<TrainLine>> connectionPoint = new HashMap<>();
-
-            //getting the train lines on the departing station
-            Set<TrainLine> linesOnDepart = stationsMap.get(departN).getTrainLines();
-
-            for(TrainLine tL : linesOnDepart){
-
-                //getting all stations on each line
-                List<Station> stationsOnLine  = tL.getStations();
-
-                for(Station linesStations : stationsOnLine){
-
-                    //clearing old lines as new station
-                    connectLines.clear();
-
-                    //getting all the lines on each looped station
-                    Set<TrainLine> linesOnStationsOnLine  = linesStations.getTrainLines();
-
-                    for(TrainLine lineOnStation : linesOnStationsOnLine){
-
-                        //checking if that line also connects to the destination and filling the line and station to the connectionPoint map
-                        if(lineOnStation.getStations().contains(stationsMap.get(ariveN))){
-
-                           //adding the line to the connectLines set storiing the lines on that station that connect
-                           connectLines.add(lineOnStation);
-
-                        }
-                    }
-
-                    if(!connectLines.isEmpty()) {
-
-                        //adding the connect station and all the lines that connect
-                        connectionPoint.put(linesStations, connectLines);
-                    }
-                }
-
-            }
-
-
-
-            for(Station connectionStation : connectionPoint.keySet()){
-
-
-                //findTrip(connectionStation.getName(), ariveN, );
-
-
-
-            }
             UI.println("station must exist and time be greater at least 1");
-
         }
 
-
-
-
-
     }
 
-*/
-
-
-    /**
-     * is callled when button pressed to show map will take the file name as parameter
-     * then clears the old map or any graphics from screen and draws the full sized image just off the top corner
-     * the divider is moved in to show the image no matter the window size and the user can pull it futher if required
-     * @param fileName
-     * */
-    public void showMap(String fileName){
-
-        UI.clearGraphics();
-
-        //moving the text divider to the far left
-        UI.setDivider(0);
-
-        UI.drawImage(fileName, 10, 10);
-    }
 
 
     /**
@@ -815,6 +703,8 @@ public class WellingtonTrains{
 
         UI.drawImage(fileName, 10, 10);
     }
+
+
 
 
     // Utility method to help with reading data files
