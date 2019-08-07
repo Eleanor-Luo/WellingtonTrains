@@ -9,3 +9,6 @@ find if stations are connected and the line
 list all stations and all lines
 
 find the next departure time for a station
+
+
+Some Code is provided for project already
