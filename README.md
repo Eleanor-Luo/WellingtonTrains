@@ -1,4 +1,6 @@
 # WellingtonTrains
+PLEASE DO NOT PLAGIARIZE FROM THIS REPOSITORY IF YOU ARE TAKING THE SAME COURSE/ASSIGNMENT THANK YOU :)
+
 Assignment for practicing use of map collections
 
 Can run querrys on all wellington region train lines 
